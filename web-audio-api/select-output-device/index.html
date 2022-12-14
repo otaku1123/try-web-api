@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+</head>
+<body>
+	<div><audio src="./sample.mp3" controls></audio></div>
+	<div><select name="devices" id="devices"></select></div>
+	<script>
+		!function(){
+			const mediaFile = './sample.mp3';
+			const select = document.querySelector('select');
+			navigator.mediaDevices.enumerateDevices().then(devices=>{
+				devices.filter(device => device.kind === 'audiooutput').forEach(device=>{
+					let option = document.createElement('option');
+					option.value = device.deviceId;
+					option.text = '[' + device.kind + '] ' + device.label;
+					select.appendChild(option);
+				})
+			}).catch(error=>{
+				console.log(error);
+			});
+
+			select.onchange = e => {
+				const audio = document.querySelector('audio');
+				audio.pause();
+				audio.currentTime = 0;
+				audio.setSinkId(e.currentTarget.value).then(()=>{
+					console.log('set ' + audio.sinkId);
+				}).catch(error=>{
+					console.log(error);
+				})
+			}
+		}();
+	</script>
+</body>
+</html>
